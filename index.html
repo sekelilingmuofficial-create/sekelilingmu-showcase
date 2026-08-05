@@ -258,9 +258,16 @@
       <span class="path mono">~/sekelilingmu/projects</span>
     </div>
     <div class="term-body mono">
-      <div><span class="cmd">$</span> <span class="out">status --all</span></div>
-      <div>4 <span style="color:var(--cyan)">live</span> · 1 <span style="color:var(--amber)">in_progress</span> · 3 <span style="color:var(--gray)">coming_soon</span><span class="cursor"></span></div>
+
+    <div>
+        <span class="cmd">$</span>
+        <span class="out" id="terminal-command"></span>
+        <span class="cursor"></span>
     </div>
+
+    <div id="terminal-output"></div>
+
+	</div>
   </div>
 
   <h1>Kumpulan project yang saya bangun,<br><span class="accent">berjalan di infrastruktur nyata.</span></h1>
@@ -441,18 +448,86 @@
 </footer>
 
 <script>
-  const chips = document.querySelectorAll('.chip');
-  const cards = document.querySelectorAll('.card');
-  chips.forEach(chip => {
-    chip.addEventListener('click', () => {
-      chips.forEach(c => c.classList.remove('active'));
-      chip.classList.add('active');
-      const filter = chip.dataset.filter;
-      cards.forEach(card => {
-        card.style.display = (filter === 'all' || card.dataset.status === filter) ? 'flex' : 'none';
-      });
+/* ==========================
+   FILTER PROJECT
+========================== */
+
+const chips = document.querySelectorAll(".chip");
+const cards = document.querySelectorAll(".card");
+
+chips.forEach(chip => {
+    chip.addEventListener("click", () => {
+
+        chips.forEach(c => c.classList.remove("active"));
+        chip.classList.add("active");
+
+        const filter = chip.dataset.filter;
+
+        cards.forEach(card => {
+            card.style.display =
+                filter === "all" || card.dataset.status === filter
+                    ? "flex"
+                    : "none";
+        });
+
     });
-  });
+});
+
+
+/* ==========================
+   TERMINAL TYPEWRITER
+========================== */
+
+const terminalCommand = document.getElementById("terminal-command");
+const terminalOutput = document.getElementById("terminal-output");
+
+const command = "status --all";
+
+const output = `
+4 <span style="color:var(--cyan)">live</span> ·
+1 <span style="color:var(--amber)">in_progress</span> ·
+3 <span style="color:var(--gray)">coming_soon</span>
+`;
+
+let index = 0;
+
+function startTyping() {
+
+    terminalCommand.innerHTML = "";
+    terminalOutput.innerHTML = "";
+
+    index = 0;
+
+    type();
+
+}
+
+function type() {
+
+    if (index < command.length) {
+
+        terminalCommand.innerHTML += command.charAt(index);
+
+        index++;
+
+        setTimeout(type, 70);
+
+    } else {
+
+        setTimeout(() => {
+
+            terminalOutput.innerHTML = output;
+
+            setTimeout(startTyping, 3000);
+
+        }, 500);
+
+    }
+
+}
+
+window.addEventListener("load", startTyping);
+
 </script>
 
 </body>
