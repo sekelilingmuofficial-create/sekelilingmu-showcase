@@ -85,12 +85,30 @@
   .term-body{padding:20px 22px; font-size:14px; line-height:1.85; color:var(--muted);}
   .term-body .cmd{color:var(--cyan);}
   .term-body .out{color:var(--text);}
-  .cursor{
-    display:inline-block; width:8px; height:15px; background:var(--cyan);
-    vertical-align:middle; margin-left:4px;
-    animation:blink 1s steps(1) infinite;
-  }
+  
 
+	.terminal-line{
+		height:30px;
+		display:flex;
+		align-items:center;
+		white-space:pre;
+	}
+	
+	#terminal-output{
+		padding-left:18px;
+	}
+	
+	.cursor{
+		display:inline-block;
+		width:8px;
+		height:16px;
+		background:var(--cyan);
+		margin-left:2px;
+		animation:blink 1s steps(1) infinite;
+		flex-shrink:0;
+	}
+  
+  
   h1{
     font-family:'JetBrains Mono', monospace;
     font-size:clamp(28px, 4.4vw, 46px);
@@ -246,7 +264,7 @@
   <div class="brand"><span class="brand-dot"></span> sekelilingmu<span style="color:var(--muted)">.dev</span></div>
   <div class="top-links">
     <a href="#projects">Projects</a>
-	<a href="https://www.linkedin.com/in/ardiansyah-rakhmat/">LinkedIn</a>
+	<a href="https://www.linkedin.com/in/ardiansyah-rakhmat/" target="_blank" rel="noopener">LinkedIn</a>
     <a href="https://github.com/sekelilingmuofficial-create" target="_blank" rel="noopener">Github</a>
   </div>
 </div>
@@ -259,13 +277,13 @@
     </div>
     <div class="term-body mono">
 
-    <div>
-        <span class="cmd">$</span>
-        <span class="out" id="terminal-command"></span>
-        <span class="cursor"></span>
-    </div>
+    <div class="terminal-line">
+     <span class="cmd">$</span>
+     <span class="out" id="terminal-command"></span>
+     <span class="cursor" id="cursor"></span>
+	</div>
 
-    <div class="out" id="terminal-output"></div>
+	<div class="terminal-line out" id="terminal-output"></div>
 
 	</div>
   </div>
@@ -442,7 +460,7 @@
   <div class="copy">© 2026 Sekelilingmu — All rights reserved.</div>
   <div class="footer-links">
     <a href="https://github.com/sekelilingmuofficial-create" target="_blank" rel="noopener">Github</a>
-    <a href="https://www.linkedin.com/in/ardiansyah-rakhmat/">LinkedIn</a>
+    <a href="https://www.linkedin.com/in/ardiansyah-rakhmat/" target="_blank" rel="noopener"> LinkedIn</a>
     <a href="mailto:ardiansyahrakhmat7@gmail.com">Email</a>
   </div>
 </footer>
@@ -483,21 +501,19 @@ const terminalOutput = document.getElementById("terminal-output");
 
 const command = "status --all";
 
-const output =
-'4 <span style="color:var(--cyan)">live</span> · ' +
-'1 <span style="color:var(--amber)">in_progress</span> · ' +
-'3 <span style="color:var(--gray)">coming_soon</span>';
+const outputText =
+"4 live · 1 in_progress · 3 coming_soon";
 
-let commandIndex = 0;
-let outputIndex = 0;
+let cmdIndex = 0;
+let outIndex = 0;
 
 function startTyping(){
 
     terminalCommand.textContent = "";
     terminalOutput.innerHTML = "";
 
-    commandIndex = 0;
-    outputIndex = 0;
+    cmdIndex = 0;
+    outIndex = 0;
 
     typeCommand();
 
@@ -505,11 +521,11 @@ function startTyping(){
 
 function typeCommand(){
 
-    if(commandIndex < command.length){
+    if(cmdIndex < command.length){
 
-        terminalCommand.textContent += command.charAt(commandIndex);
+        terminalCommand.textContent += command.charAt(cmdIndex);
 
-        commandIndex++;
+        cmdIndex++;
 
         setTimeout(typeCommand,70);
 
@@ -523,13 +539,22 @@ function typeCommand(){
 
 function typeOutput(){
 
-    if(outputIndex < output.length){
+    if(outIndex < outputText.length){
 
-        terminalOutput.innerHTML = output.substring(0, outputIndex + 1);
+        const current = outputText.substring(0,outIndex+1);
 
-        outputIndex++;
+        terminalOutput.innerHTML =
+            current
+            .replace("live",
+                '<span style="color:var(--cyan)">live</span>')
+            .replace("in_progress",
+                '<span style="color:var(--amber)">in_progress</span>')
+            .replace("coming_soon",
+                '<span style="color:var(--gray)">coming_soon</span>');
 
-        setTimeout(typeOutput,20);
+        outIndex++;
+
+        setTimeout(typeOutput,30);
 
     }else{
 
@@ -539,7 +564,7 @@ function typeOutput(){
 
 }
 
-window.addEventListener("load", startTyping);
+window.addEventListener("load",startTyping);
 
 </script>
 
