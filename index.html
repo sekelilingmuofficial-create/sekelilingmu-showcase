@@ -265,7 +265,7 @@
         <span class="cursor"></span>
     </div>
 
-    <div id="terminal-output"></div>
+    <div class="out" id="terminal-output"></div>
 
 	</div>
   </div>
@@ -483,44 +483,57 @@ const terminalOutput = document.getElementById("terminal-output");
 
 const command = "status --all";
 
-const output = `
-4 <span style="color:var(--cyan)">live</span> ·
-1 <span style="color:var(--amber)">in_progress</span> ·
-3 <span style="color:var(--gray)">coming_soon</span>
-`;
+const output =
+'4 <span style="color:var(--cyan)">live</span> · ' +
+'1 <span style="color:var(--amber)">in_progress</span> · ' +
+'3 <span style="color:var(--gray)">coming_soon</span>';
 
-let index = 0;
+let commandIndex = 0;
+let outputIndex = 0;
 
-function startTyping() {
+function startTyping(){
 
-    terminalCommand.innerHTML = "";
+    terminalCommand.textContent = "";
     terminalOutput.innerHTML = "";
 
-    index = 0;
+    commandIndex = 0;
+    outputIndex = 0;
 
-    type();
+    typeCommand();
 
 }
 
-function type() {
+function typeCommand(){
 
-    if (index < command.length) {
+    if(commandIndex < command.length){
 
-        terminalCommand.innerHTML += command.charAt(index);
+        terminalCommand.textContent += command.charAt(commandIndex);
 
-        index++;
+        commandIndex++;
 
-        setTimeout(type, 70);
+        setTimeout(typeCommand,70);
 
-    } else {
+    }else{
 
-        setTimeout(() => {
+        setTimeout(typeOutput,400);
 
-            terminalOutput.innerHTML = output;
+    }
 
-            setTimeout(startTyping, 3000);
+}
 
-        }, 500);
+function typeOutput(){
+
+    if(outputIndex < output.length){
+
+        terminalOutput.innerHTML = output.substring(0, outputIndex + 1);
+
+        outputIndex++;
+
+        setTimeout(typeOutput,20);
+
+    }else{
+
+        setTimeout(startTyping,3000);
 
     }
 
