@@ -335,6 +335,12 @@
     *{animation:none !important; transition:none !important;}
   }
 </style>
+
+<style>
+.device-preview{position:relative;width:620px;max-width:100%;aspect-ratio:16/10;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.device-preview img{position:absolute;max-width:100%;max-height:100%;object-fit:contain;opacity:0;transform:scale(.94);filter:blur(8px);transition:opacity 1.4s cubic-bezier(.22,1,.36,1),transform 1.4s cubic-bezier(.22,1,.36,1),filter 1.4s cubic-bezier(.22,1,.36,1)}
+.device-preview img.active{opacity:1;transform:scale(1);filter:blur(0)}
+</style>
 </head>
 <body>
 
@@ -676,5 +682,17 @@ deviceImage.onload=()=>{deviceImage.classList.remove("hide");deviceImage.classLi
 
 </script>
 
-</body>
+
+<script>
+const imgs=["desktop.png","tablet.png","phone.png"];
+const box=document.querySelector(".device-preview");
+box.innerHTML=imgs.map((s,i)=>`<img src="assets/devices/${s}" class="${i==0?'active':''}">`).join('');
+const nodes=[...box.querySelectorAll("img")];
+let i=0;
+setInterval(()=>{
+ nodes[i].classList.remove("active");
+ i=(i+1)%nodes.length;
+ nodes[i].classList.add("active");
+},3500);
+</script></body>
 </html>
