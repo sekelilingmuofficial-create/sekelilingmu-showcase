@@ -371,6 +371,17 @@ h1{font-size:clamp(2rem,8vw,2.6rem)}
 .mobile-menu.show{right:0}
 @media(max-width:768px){.top-links{display:none!important}.menu-toggle{display:block}}
 </style>
+
+<style id="override-fixes">
+@media (max-width:768px){
+.top-links{display:none!important;}
+.menu-toggle{display:block!important;}
+}
+.device-preview img[src*="phone"]{
+max-height:360px!important;
+width:auto!important;
+}
+</style>
 </head>
 <body>
 
