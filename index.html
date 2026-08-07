@@ -364,6 +364,12 @@ h1{font-size:clamp(2rem,8vw,2.6rem)}
 .device-preview{max-width:280px}
 }
 
+
+.menu-toggle{display:none;background:none;border:0;color:var(--text);font-size:28px;cursor:pointer}
+.mobile-menu{position:fixed;top:70px;right:-260px;width:240px;background:var(--panel);border-left:1px solid var(--line);transition:right .3s ease;z-index:999;display:flex;flex-direction:column}
+.mobile-menu a{padding:16px;color:var(--text);text-decoration:none;border-bottom:1px solid var(--line)}
+.mobile-menu.show{right:0}
+@media(max-width:768px){.top-links{display:none!important}.menu-toggle{display:block}}
 </style>
 </head>
 <body>
@@ -706,5 +712,5 @@ deviceImage.onload=()=>{deviceImage.classList.remove("hide");deviceImage.classLi
 
 </script>
 
-</body>
+<script>const b=document.getElementById('menuBtn'),m=document.getElementById('mobileMenu');if(b)b.onclick=()=>m.classList.toggle('show');</script></body>
 </html>
