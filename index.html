@@ -371,6 +371,22 @@ h1{font-size:clamp(2rem,8vw,2.6rem)}
 .mobile-menu.show{right:0}
 @media(max-width:768px){.top-links{display:none!important}.menu-toggle{display:block}}
 </style>
+
+<style>
+.menu-toggle{display:none;background:none;border:0;color:#fff;font-size:28px;cursor:pointer}
+@media (max-width:768px){
+.menu-toggle{display:block!important}
+.top-links{display:none;position:absolute;top:70px;left:0;right:0;background:#111827;flex-direction:column;padding:20px}
+.top-links.open{display:flex!important}
+}
+</style>
+<script>
+document.addEventListener('DOMContentLoaded',()=>{
+ const b=document.querySelector('.menu-toggle');
+ const m=document.querySelector('.top-links');
+ if(b&&m){b.onclick=()=>m.classList.toggle('open');}
+});
+</script>
 </head>
 <body>
 
