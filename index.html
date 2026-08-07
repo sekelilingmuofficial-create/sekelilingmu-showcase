@@ -85,7 +85,8 @@
 		position:relative;
 	}
 	
-	.device-preview img{
+	.device-preview{width:min(100%,620px);position:relative;display:flex;justify-content:center;align-items:center;overflow:visible;}
+.device-preview img{
 		width:100%;
 		display:block;
 		filter:
@@ -637,8 +638,22 @@ function typeOutput(){
 
 window.addEventListener("load",startTyping);
 
+
+const deviceImage=document.getElementById("deviceImage");
+if(deviceImage){
+const devices=["assets/devices/phone.png","assets/devices/tablet.png","assets/devices/desktop.png"];
+let current=2;
+setInterval(()=>{
+deviceImage.classList.add("hide");
+setTimeout(()=>{
+current=(current+1)%devices.length;
+deviceImage.src=devices[current];
+deviceImage.onload=()=>{deviceImage.classList.remove("hide");deviceImage.classList.add("show");};
+},400);
+},3500);
+}
+
 </script>
 
 </body>
 </html>
-<!-- revised placeholder -->
