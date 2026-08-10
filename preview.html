@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Live Preview — Sekelilingmu</title>
+<script>
+/* Set tema sebelum halaman dirender agar tidak ada kedipan warna (FOUC) */
+(function(){
+  try{
+    const saved = localStorage.getItem('sekelilingmu-theme');
+    const theme = saved || (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+    if(theme === 'light') document.documentElement.setAttribute('data-theme','light');
+  }catch(e){}
+})();
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #0A0F1A;
+    --bg-rgb: 10,15,26;
+    --panel: #101827;
+    --panel-2: #151F32;
+    --line: #223049;
+    --text: #E7EDF6;
+    --muted: #8CA0BE;
+    --cyan: #4ADE80;
+    --amber: #FBBF24;
+    --gray: #64748B;
+    --red: #FB7185;
+    --tag-text: #B6F5C9;
+    --shadow: rgba(0,0,0,.65);
+    --shadow-soft: rgba(0,0,0,0.6);
+    --glow-1: rgba(74,222,128,0.06);
+    --glow-2: rgba(251,191,36,0.05);
+  }
+  [data-theme="light"]{
+    --bg: #F6F8FB;
+    --bg-rgb: 246,248,251;
+    --panel: #FFFFFF;
+    --panel-2: #F1F5F9;
+    --line: #E2E8F0;
+    --text: #0F172A;
+    --muted: #5B6B85;
+    --cyan: #16A34A;
+    --amber: #B45309;
+    --gray: #64748B;
+    --red: #E11D48;
+    --tag-text: #15803D;
+    --shadow: rgba(15,23,42,.18);
+    --shadow-soft: rgba(15,23,42,0.12);
+    --glow-1: rgba(22,163,74,0.05);
+    --glow-2: rgba(180,83,9,0.04);
+  }
+
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    min-height:100vh;
+    background:
+      radial-gradient(circle at 15% 0%, var(--glow-1), transparent 40%),
+      radial-gradient(circle at 85% 20%, var(--glow-2), transparent 45%),
+      var(--bg);
+    color:var(--text);
+    font-family:'Inter', sans-serif;
+    -webkit-font-smoothing:antialiased;
+    transition:background-color .25s ease, color .25s ease;
+  }
+  .mono{font-family:'JetBrains Mono', monospace;}
+  a{color:inherit;}
+
+  /* ---------- topbar ---------- */
+  .topbar{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:18px 6vw;
+    border-bottom:1px solid var(--line);
+    position:sticky; top:0; z-index:20;
+    background:rgba(var(--bg-rgb),0.85);
+    backdrop-filter:blur(10px);
+  }
+  .brand{
+    display:flex; align-items:center; gap:10px;
+    font-family:'JetBrains Mono', monospace;
+    font-weight:700; font-size:15px; letter-spacing:0.02em;
+    text-decoration:none; color:var(--text);
+  }
+  .brand-dot{
+    width:9px; height:9px; border-radius:50%;
+    background:var(--cyan);
+    box-shadow:0 0 0 3px rgba(74,222,128,0.15);
+    animation:pulse 2.2s ease-in-out infinite;
+  }
+  .back-link{
+    display:inline-flex; align-items:center; gap:6px;
+    font-family:'JetBrains Mono', monospace;
+    font-size:12.5px;
+    color:var(--muted);
+    text-decoration:none;
+    padding:9px 14px;
+    border:1px solid var(--line);
+    border-radius:999px;
+    transition:border-color .15s ease, color .15s ease;
+  }
+  .back-link:hover{border-color:var(--cyan); color:var(--text);}
+
+  .theme-toggle{
+    display:flex; align-items:center; justify-content:center;
+    width:38px; height:38px;
+    border-radius:8px;
+    border:1px solid var(--line);
+    background:var(--panel);
+    color:var(--text);
+    cursor:pointer;
+    flex-shrink:0;
+    transition:border-color .15s ease, color .15s ease;
+  }
+  .theme-toggle:hover{border-color:var(--cyan); color:var(--cyan);}
+  .theme-toggle svg{width:18px; height:18px; display:block;}
+  .theme-toggle .icon-sun{display:none;}
+  [data-theme="light"] .theme-toggle .icon-moon{display:none;}
+  [data-theme="light"] .theme-toggle .icon-sun{display:block;}
+
+  /* ---------- preview hero ---------- */
+  .preview-wrap{
+    display:grid;
+    grid-template-columns:.85fr 1.15fr;
+    align-items:center;
+    gap:60px;
+    padding:70px 6vw 90px;
+    max-width:1280px;
+    margin:0 auto;
+    min-height:calc(100vh - 72px);
+  }
+  .preview-left{
+    display:flex; justify-content:center; align-items:center;
+  }
+  .preview-right{width:100%;}
+
+  .back-link.top{display:inline-flex; margin-bottom:26px;}
+
+  .preview-label{
+    font-family:'JetBrains Mono', monospace; font-size:12px; color:var(--muted);
+    text-transform:uppercase; letter-spacing:0.12em; margin-bottom:16px;
+  }
+
+  #pStatus{
+    display:inline-flex; align-items:center; gap:7px;
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px; text-transform:uppercase; letter-spacing:0.06em;
+    border:1px solid var(--line);
+    padding:5px 12px 5px 10px;
+    border-radius:999px;
+    margin-bottom:18px;
+  }
+  #pStatus .led{width:7px; height:7px; border-radius:50%;}
+  .led.live{background:var(--cyan); box-shadow:0 0 0 3px rgba(74,222,128,0.18); animation:pulse 2s infinite;}
+  .led.progress{background:var(--amber); box-shadow:0 0 0 3px rgba(251,191,36,0.16);}
+  .led.soon{background:var(--gray);}
+  .txt-live{color:var(--cyan);}
+  .txt-progress{color:var(--amber);}
+  .txt-soon{color:var(--gray);}
+
+  h1#pTitle{
+    font-family:'JetBrains Mono', monospace;
+    font-size:clamp(28px, 4vw, 42px);
+    font-weight:800;
+    line-height:1.15;
+    margin:0 0 16px;
+    letter-spacing:-0.01em;
+  }
+  #pDesc{
+    color:var(--muted); font-size:16px; line-height:1.75; margin:0 0 26px; max-width:560px;
+  }
+  .tags{display:flex; flex-wrap:wrap; gap:8px; margin-bottom:32px;}
+  .tag{
+    font-family:'JetBrains Mono', monospace; font-size:11.5px;
+    padding:5px 11px; border-radius:6px;
+    background:rgba(74,222,128,0.06); border:1px solid rgba(74,222,128,0.18);
+    color:var(--tag-text);
+  }
+
+  .preview-actions{display:flex; gap:12px; flex-wrap:wrap;}
+  .btn{
+    text-align:center;
+    font-family:'JetBrains Mono', monospace; font-size:13px; font-weight:600;
+    padding:13px 22px; border-radius:9px; text-decoration:none;
+    transition:all .15s ease;
+    display:inline-flex; align-items:center; gap:8px;
+  }
+  .btn-primary{background:var(--cyan); color:#052E17;}
+  .btn-primary:hover{background:#7CF0A3;}
+  [data-theme="light"] .btn-primary:hover{background:#22C55E;}
+  .btn-ghost{border:1px solid var(--line); color:var(--muted);}
+  .btn-ghost:hover{border-color:var(--muted); color:var(--text);}
+  .btn.disabled{
+    background:transparent; border:1px dashed var(--line); color:var(--gray);
+    pointer-events:none;
+  }
+
+  /* ---------- phone mockup ---------- */
+  .phone-mock{
+    width:min(300px, 74vw);
+    aspect-ratio:9/19.3;
+    background:#0b0b0c;
+    border-radius:44px;
+    padding:12px;
+    position:relative;
+    box-shadow:0 40px 90px var(--shadow), 0 0 0 2px rgba(255,255,255,0.05) inset;
+    margin:auto;
+  }
+  .phone-mock::before{
+    content:'';
+    position:absolute;
+    top:26px; left:50%; transform:translateX(-50%);
+    width:88px; height:24px;
+    background:#000;
+    border-radius:16px;
+    z-index:3;
+  }
+  .phone-screen{
+    width:100%; height:100%;
+    border-radius:32px;
+    overflow:hidden;
+    background:#000;
+    position:relative;
+  }
+  .phone-screen video{
+    width:100%; height:100%;
+    object-fit:cover;
+    display:block;
+  }
+  .no-video{
+    position:absolute; inset:0;
+    display:none;
+    flex-direction:column; align-items:center; justify-content:center;
+    gap:10px;
+    color:#8CA0BE;
+    font-family:'JetBrains Mono', monospace;
+    font-size:11.5px;
+    text-align:center;
+    padding:24px;
+  }
+  .no-video svg{width:30px; height:30px; opacity:.6;}
+
+  /* ---------- footer ---------- */
+  footer{
+    padding:44px 6vw; border-top:1px solid var(--line);
+    display:flex; flex-wrap:wrap; gap:20px; align-items:center; justify-content:space-between;
+  }
+  .footer-links{display:flex; gap:22px;}
+  footer a{text-decoration:none; font-size:13px; color:var(--muted);}
+  footer a:hover{color:var(--text);}
+  .copy{font-family:'JetBrains Mono', monospace; font-size:12px; color:var(--gray);}
+
+  @keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.45;}}
+  @media (prefers-reduced-motion: reduce){*{animation:none !important; transition:none !important;}}
+
+  @media (max-width:900px){
+    .preview-wrap{grid-template-columns:1fr; text-align:center; padding:50px 6vw 70px;}
+    .preview-left{order:-1; margin-bottom:10px;}
+    #pDesc{margin-left:auto; margin-right:auto;}
+    .tags, .preview-actions{justify-content:center;}
+    .back-link.top{margin-left:auto; margin-right:auto;}
+  }
+  @media (max-width:480px){
+    .topbar{padding:14px 5vw;}
+    .preview-wrap{padding:40px 5vw 50px;}
+    .phone-mock{width:min(260px, 78vw);}
+    footer{padding:34px 5vw; flex-direction:column; align-items:flex-start;}
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <a class="brand" href="index.html"><span class="brand-dot"></span> sekelilingmu<span style="color:var(--muted)">.dev</span></a>
+  <button class="theme-toggle" id="themeToggle" aria-label="Ganti mode gelap/terang" title="Ganti mode gelap/terang">
+    <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+    <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path></svg>
+  </button>
+</div>
+
+<section class="preview-wrap">
+  <div class="preview-left">
+    <div class="phone-mock">
+      <div class="phone-screen">
+        <video id="pVideo" autoplay muted loop playsinline></video>
+        <div class="no-video" id="pNoVideo">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M15 10l5-3v10l-5-3M4 6h11a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2z"></path></svg>
+          Video demo segera hadir
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="preview-right">
+    <a class="back-link top" href="index.html#projects">&larr; Semua Project</a>
+    <div class="preview-label mono">// live preview</div>
+    <div id="pStatus" class="mono"><span class="led"></span><span id="pStatusText"></span></div>
+    <h1 id="pTitle">&nbsp;</h1>
+    <p id="pDesc"></p>
+    <div class="tags" id="pTags"></div>
+    <div class="preview-actions">
+      <a class="btn btn-primary" id="pWebApp" target="_blank" rel="noopener">Web App</a>
+      <a class="btn btn-ghost" id="pSource" target="_blank" rel="noopener">Source</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="copy">© 2026 Sekelilingmu — All rights reserved.</div>
+  <div class="footer-links">
+    <a href="https://github.com/sekelilingmuofficial-create" target="_blank" rel="noopener">Github</a>
+    <a href="https://www.linkedin.com/in/ardiansyah-rakhmat/" target="_blank" rel="noopener">LinkedIn</a>
+    <a href="mailto:ardiansyahrakhmat7@gmail.com">Email</a>
+  </div>
+</footer>
+
+<script>
+/* ==========================
+   DATA PROJECT
+   Tambahkan/ubah data project di sini.
+   Nama file video harus: assets/videos/{id}.mp4
+========================== */
+const PROJECTS = {
+  "ingatanku": {
+    title: "Ingatanku App",
+    status: "live",
+    desc: "Aplikasi manajemen keuangan pribadi untuk mencatat pemasukan, pengeluaran, mengelola budget, melihat laporan keuangan, serta pengingat tagihan otomatis.",
+    tags: ["Flutter","Laravel","MySQL","REST API"],
+    webapp: "https://ingatanku-landing.vercel.app/",
+    source: "https://github.com/sekelilingmuofficial-create"
+  },
+  "sekelilingmu-docs": {
+    title: "Sekelilingmu Docs",
+    status: "live",
+    desc: "Developer platform yang menyediakan dokumentasi teknologi, showcase project, roadmap pembelajaran, serta resource untuk developer Indonesia.",
+    tags: ["Next.js","TypeScript","Tailwind CSS","Vercel"],
+    webapp: "https://sekelilingmu-docs.vercel.app",
+    source: "https://github.com/sekelilingmuofficial-create/sekelilingmu-docs"
+  },
+  "nominal-pos": {
+    title: "Nominal POS",
+    status: "live",
+    desc: "Smart Point of Sales system untuk UMKM dan berbagai jenis bisnis, dilengkapi Inventory Management, Barcode Scanner, Thermal Printer, Dashboard Analytics, dan Multi Payment.",
+    tags: ["Flutter","Laravel","POS System","MySQL","Inventory"],
+    webapp: "https://nominal-web-two.vercel.app/",
+    source: "https://github.com/sekelilingmuofficial-create"
+  },
+  "presensi": {
+    title: "Presensi App",
+    status: "live",
+    desc: "Smart Attendance System berbasis GPS dan selfie verification untuk memastikan data kehadiran lebih akurat, transparan, dan tidak dapat dititipkan.",
+    tags: ["Flutter","Laravel","GPS","REST API","VPS"],
+    webapp: "https://presensi-web-one.vercel.app/",
+    source: "https://github.com/sekelilingmuofficial-create"
+  },
+  "ardya-smarthome": {
+    title: "Ardya Assist Smarthome",
+    status: "progress",
+    desc: "Smart home system berbasis IoT yang menghubungkan ESP32, Firebase Realtime Database, dan aplikasi Flutter secara real-time — kontrol perangkat, skenario otomatis, CCTV live view, kunci pintu jarak jauh, dan statistik konsumsi energi.",
+    tags: ["Flutter","Firebase","ESP32","IoT","Realtime DB"],
+    webapp: "https://ardya-smarthome-web.vercel.app/",
+    source: "https://github.com/sekelilingmuofficial-create"
+  },
+  "akaris-hris": {
+    title: "Akaris HRIS",
+    status: "soon",
+    desc: "Human Resources Information System terintegrasi untuk absensi, payroll, dan manajemen karyawan — akurat di setiap langkah untuk perusahaan yang terus bertumbuh.",
+    tags: ["Flutter","Laravel","REST API","HRIS"],
+    webapp: "https://akaris-web-khaki.vercel.app/",
+    source: "https://github.com/sekelilingmuofficial-create"
+  },
+  "tuantroli": {
+    title: "TuanTroli App SaaS",
+    status: "soon",
+    desc: "Platform e-commerce SaaS multi-tenant yang memungkinkan banyak toko online berjalan dalam satu sistem — warna, logo, dan tema tampilan bisa disesuaikan penuh sesuai identitas brand tiap pelanggan.",
+    tags: ["Flutter","Laravel","REST API","Multi-Tenant"],
+    webapp: "https://tuantroli-web.vercel.app/",
+    source: "https://github.com/sekelilingmuofficial-create/sekelilingmu-docs"
+  }
+};
+
+const STATUS_LABEL = { live:"Live", progress:"In Progress", soon:"Coming Soon" };
+
+document.addEventListener('DOMContentLoaded', () => {
+
+  /* ----- theme toggle (tersinkron dengan index.html) ----- */
+  const themeBtn = document.getElementById('themeToggle');
+  if(themeBtn){
+    themeBtn.setAttribute('aria-pressed', document.documentElement.getAttribute('data-theme')==='light' ? 'true' : 'false');
+    themeBtn.addEventListener('click', () => {
+      const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+      if(isLight){
+        document.documentElement.removeAttribute('data-theme');
+        try{ localStorage.setItem('sekelilingmu-theme','dark'); }catch(e){}
+        themeBtn.setAttribute('aria-pressed','false');
+      }else{
+        document.documentElement.setAttribute('data-theme','light');
+        try{ localStorage.setItem('sekelilingmu-theme','light'); }catch(e){}
+        themeBtn.setAttribute('aria-pressed','true');
+      }
+    });
+  }
+
+  /* ----- render data project berdasarkan ?id= ----- */
+  const params = new URLSearchParams(window.location.search);
+  const id = params.get('id');
+  const project = PROJECTS[id];
+
+  const video = document.getElementById('pVideo');
+  const noVideo = document.getElementById('pNoVideo');
+
+  if(!project){
+    document.getElementById('pTitle').textContent = "Project tidak ditemukan";
+    document.getElementById('pDesc').textContent = "Link preview ini tidak valid. Silakan kembali ke halaman utama dan pilih salah satu project.";
+    document.getElementById('pStatus').style.display = 'none';
+    document.querySelector('.preview-label').style.display = 'none';
+    document.getElementById('pWebApp').style.display = 'none';
+    document.getElementById('pSource').style.display = 'none';
+    video.style.display = 'none';
+    noVideo.style.display = 'flex';
+    return;
+  }
+
+  document.title = project.title + " — Live Preview — Sekelilingmu";
+  document.getElementById('pTitle').textContent = project.title;
+  document.getElementById('pDesc').textContent = project.desc;
+
+  const statusEl = document.getElementById('pStatus');
+  statusEl.classList.add('txt-' + project.status);
+  statusEl.querySelector('.led').classList.add(project.status);
+  document.getElementById('pStatusText').textContent = STATUS_LABEL[project.status] || project.status;
+
+  const tagsWrap = document.getElementById('pTags');
+  project.tags.forEach(t => {
+    const span = document.createElement('span');
+    span.className = 'tag';
+    span.textContent = t;
+    tagsWrap.appendChild(span);
+  });
+
+  const webBtn = document.getElementById('pWebApp');
+  webBtn.href = project.webapp;
+  const srcBtn = document.getElementById('pSource');
+  srcBtn.href = project.source;
+
+  /* ----- video: autoplay, fallback jika file belum ada ----- */
+  video.addEventListener('error', () => {
+    video.style.display = 'none';
+    noVideo.style.display = 'flex';
+  });
+  video.src = 'assets/videos/' + id + '.mp4';
+  video.play().catch(() => {});
+});
+</script>
+</body>
+</html>
