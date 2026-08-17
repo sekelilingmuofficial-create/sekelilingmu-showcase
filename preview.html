@@ -245,6 +245,127 @@
   }
   .no-video svg{width:30px; height:30px; opacity:.6;}
 
+  /* ---------- device tabs (Mobile / Tablet / Laptop / PC) ---------- */
+  .device-tabs{
+    display:flex; gap:8px; flex-wrap:wrap;
+    justify-content:center;
+    margin-bottom:24px;
+  }
+  .device-tab{
+    font-family:'JetBrains Mono', monospace; font-size:12px; font-weight:600;
+    padding:8px 15px; border-radius:999px;
+    border:1px solid var(--line);
+    background:var(--panel); color:var(--muted);
+    cursor:pointer;
+    transition:all .15s ease;
+  }
+  .device-tab:hover{border-color:var(--cyan); color:var(--text);}
+  .device-tab.active{background:var(--cyan); border-color:var(--cyan); color:#052E17;}
+  [data-theme="light"] .device-tab.active{color:#fff;}
+
+  .mockup-stage{display:flex; justify-content:center; align-items:center; width:100%;}
+
+  /* ---------- tablet mockup ---------- */
+  .tablet-mock{
+    width:min(480px, 82vw);
+    aspect-ratio:4/3;
+    background:#0b0b0c;
+    border-radius:26px;
+    padding:16px;
+    position:relative;
+    box-shadow:0 40px 90px var(--shadow), 0 0 0 2px rgba(255,255,255,0.05) inset;
+    margin:auto;
+  }
+  .tablet-mock::before{
+    content:'';
+    position:absolute;
+    top:8px; left:50%; transform:translateX(-50%);
+    width:8px; height:8px;
+    background:#1c1c1e;
+    border-radius:50%;
+    z-index:3;
+  }
+  .tablet-screen{
+    width:100%; height:100%;
+    border-radius:12px;
+    overflow:hidden;
+    background:#000;
+    position:relative;
+  }
+  .tablet-screen video{width:100%; height:100%; object-fit:cover; display:block;}
+
+  /* ---------- laptop mockup ---------- */
+  .laptop-mock{width:min(620px, 88vw); margin:auto;}
+  .laptop-top{
+    background:#0b0b0c;
+    border-radius:16px 16px 3px 3px;
+    padding:14px 14px 10px;
+    box-shadow:0 40px 90px var(--shadow), 0 0 0 2px rgba(255,255,255,0.05) inset;
+    position:relative;
+  }
+  .laptop-top::before{
+    content:'';
+    position:absolute;
+    top:5px; left:50%; transform:translateX(-50%);
+    width:6px; height:6px;
+    background:#1c1c1e;
+    border-radius:50%;
+  }
+  .laptop-screen{
+    width:100%;
+    aspect-ratio:16/10;
+    border-radius:5px;
+    overflow:hidden;
+    background:#000;
+    position:relative;
+  }
+  .laptop-screen video{width:100%; height:100%; object-fit:cover; display:block;}
+  .laptop-bottom{
+    height:15px;
+    background:linear-gradient(180deg,#1e1e20,#0b0b0c);
+    border-radius:0 0 9px 9px;
+    position:relative;
+    box-shadow:0 18px 30px -10px var(--shadow-soft);
+  }
+  .laptop-bottom::before{
+    content:'';
+    position:absolute; top:0; left:50%; transform:translateX(-50%);
+    width:80px; height:5px;
+    background:#050505;
+    border-radius:0 0 6px 6px;
+  }
+
+  /* ---------- desktop / PC mockup ---------- */
+  .desktop-mock{width:min(720px, 92vw); margin:auto; text-align:center;}
+  .desktop-screen-frame{
+    background:#0b0b0c;
+    border-radius:14px;
+    padding:14px;
+    box-shadow:0 40px 90px var(--shadow), 0 0 0 2px rgba(255,255,255,0.05) inset;
+  }
+  .desktop-screen{
+    width:100%;
+    aspect-ratio:16/9;
+    border-radius:5px;
+    overflow:hidden;
+    background:#000;
+    position:relative;
+  }
+  .desktop-screen video{width:100%; height:100%; object-fit:cover; display:block;}
+  .desktop-stand{
+    width:64px; height:42px;
+    margin:0 auto;
+    background:linear-gradient(180deg,#1e1e20,#0b0b0c);
+    clip-path:polygon(38% 0, 62% 0, 78% 100%, 22% 100%);
+  }
+  .desktop-base{
+    width:210px; height:11px;
+    margin:0 auto;
+    background:#0b0b0c;
+    border-radius:6px;
+    box-shadow:0 14px 26px -6px var(--shadow-soft);
+  }
+
   /* ---------- footer ---------- */
   footer{
     padding:44px 6vw; border-top:1px solid var(--line);
@@ -264,11 +385,17 @@
     #pDesc{margin-left:auto; margin-right:auto;}
     .tags, .preview-actions{justify-content:center;}
     .back-link.top{margin-left:auto; margin-right:auto;}
+    .laptop-mock, .desktop-mock{width:min(440px, 90vw);}
+    .tablet-mock{width:min(380px, 86vw);}
   }
   @media (max-width:480px){
     .topbar{padding:14px 5vw;}
     .preview-wrap{padding:40px 5vw 50px;}
     .phone-mock{width:min(260px, 78vw);}
+    .tablet-mock{width:min(300px, 84vw);}
+    .laptop-mock, .desktop-mock{width:min(300px, 90vw);}
+    .device-tabs{margin-bottom:18px;}
+    .device-tab{padding:7px 12px; font-size:11px;}
     footer{padding:34px 5vw; flex-direction:column; align-items:flex-start;}
   }
 </style>
@@ -285,15 +412,8 @@
 
 <section class="preview-wrap">
   <div class="preview-left">
-    <div class="phone-mock">
-      <div class="phone-screen">
-        <video id="pVideo" autoplay muted loop playsinline></video>
-        <div class="no-video" id="pNoVideo">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M15 10l5-3v10l-5-3M4 6h11a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2z"></path></svg>
-          Video demo segera hadir
-        </div>
-      </div>
-    </div>
+    <div class="device-tabs" id="deviceTabs"></div>
+    <div class="mockup-stage" id="mockupStage"></div>
   </div>
 
   <div class="preview-right">
@@ -323,7 +443,12 @@
 /* ==========================
    DATA PROJECT
    Tambahkan/ubah data project di sini.
-   Nama file video harus: assets/videos/{id}.mp4
+
+   "devices" adalah daftar tampilan yang tersedia untuk project ini.
+   type boleh: "phone" | "tablet" | "laptop" | "desktop"
+   Kalau ada lebih dari 1 device, otomatis muncul tab pemilih di atas mockup.
+
+   Nama file video: assets/videos/{video}
 ========================== */
 const PROJECTS = {
   "ingatanku": {
@@ -332,7 +457,10 @@ const PROJECTS = {
     desc: "Aplikasi manajemen keuangan pribadi untuk mencatat pemasukan, pengeluaran, mengelola budget, melihat laporan keuangan, serta pengingat tagihan otomatis.",
     tags: ["Flutter","Laravel","MySQL","REST API"],
     webapp: "https://ingatanku-landing.vercel.app/",
-    source: "https://github.com/sekelilingmuofficial-create"
+    source: "https://github.com/sekelilingmuofficial-create",
+    devices: [
+      { type:"phone", label:"Mobile App", video:"ingatanku.mp4" }
+    ]
   },
   "sekelilingmu-docs": {
     title: "Sekelilingmu Docs",
@@ -340,7 +468,10 @@ const PROJECTS = {
     desc: "Developer platform yang menyediakan dokumentasi teknologi, showcase project, roadmap pembelajaran, serta resource untuk developer Indonesia.",
     tags: ["Next.js","TypeScript","Tailwind CSS","Vercel"],
     webapp: "https://sekelilingmu-docs.vercel.app",
-    source: "https://github.com/sekelilingmuofficial-create/sekelilingmu-docs"
+    source: "https://github.com/sekelilingmuofficial-create/sekelilingmu-docs",
+    devices: [
+      { type:"laptop", label:"Web", video:"sekelilingmu-docs.mp4" }
+    ]
   },
   "nominal-pos": {
     title: "Nominal POS",
@@ -348,7 +479,11 @@ const PROJECTS = {
     desc: "Smart Point of Sales system untuk UMKM dan berbagai jenis bisnis, dilengkapi Inventory Management, Barcode Scanner, Thermal Printer, Dashboard Analytics, dan Multi Payment.",
     tags: ["Flutter","Laravel","POS System","MySQL","Inventory"],
     webapp: "https://nominal-web-two.vercel.app/",
-    source: "https://github.com/sekelilingmuofficial-create"
+    source: "https://github.com/sekelilingmuofficial-create",
+    devices: [
+      { type:"tablet",  label:"Kasir (Tablet)",   video:"nominal-pos-tablet.mp4" },
+      { type:"desktop", label:"Dashboard Admin",  video:"nominal-pos-desktop.mp4" }
+    ]
   },
   "presensi": {
     title: "Presensi App",
@@ -356,7 +491,11 @@ const PROJECTS = {
     desc: "Smart Attendance System berbasis GPS dan selfie verification untuk memastikan data kehadiran lebih akurat, transparan, dan tidak dapat dititipkan.",
     tags: ["Flutter","Laravel","GPS","REST API","VPS"],
     webapp: "https://presensi-web-one.vercel.app/",
-    source: "https://github.com/sekelilingmuofficial-create"
+    source: "https://github.com/sekelilingmuofficial-create",
+    devices: [
+      { type:"phone",  label:"Mobile App", video:"presensi.mp4" },
+      { type:"laptop", label:"Web Admin",  video:"presensi-admin.mp4" }
+    ]
   },
   "ardya-smarthome": {
     title: "Ardya Assist Smarthome",
@@ -364,7 +503,10 @@ const PROJECTS = {
     desc: "Smart home system berbasis IoT yang menghubungkan ESP32, Firebase Realtime Database, dan aplikasi Flutter secara real-time — kontrol perangkat, skenario otomatis, CCTV live view, kunci pintu jarak jauh, dan statistik konsumsi energi.",
     tags: ["Flutter","Firebase","ESP32","IoT","Realtime DB"],
     webapp: "https://ardya-smarthome-web.vercel.app/",
-    source: "https://github.com/sekelilingmuofficial-create"
+    source: "https://github.com/sekelilingmuofficial-create",
+    devices: [
+      { type:"phone", label:"Mobile App", video:"ardya-smarthome.mp4" }
+    ]
   },
   "akaris-hris": {
     title: "Akaris HRIS",
@@ -372,7 +514,11 @@ const PROJECTS = {
     desc: "Human Resources Information System terintegrasi untuk absensi, payroll, dan manajemen karyawan — akurat di setiap langkah untuk perusahaan yang terus bertumbuh.",
     tags: ["Flutter","Laravel","REST API","HRIS"],
     webapp: "https://akaris-web-khaki.vercel.app/",
-    source: "https://github.com/sekelilingmuofficial-create"
+    source: "https://github.com/sekelilingmuofficial-create",
+    devices: [
+      { type:"phone",  label:"Mobile App", video:"akaris-hris.mp4" },
+      { type:"laptop", label:"Web Admin",  video:"akaris-hris-admin.mp4" }
+    ]
   },
   "tuantroli": {
     title: "TuanTroli App SaaS",
@@ -380,11 +526,77 @@ const PROJECTS = {
     desc: "Platform e-commerce SaaS multi-tenant yang memungkinkan banyak toko online berjalan dalam satu sistem — warna, logo, dan tema tampilan bisa disesuaikan penuh sesuai identitas brand tiap pelanggan.",
     tags: ["Flutter","Laravel","REST API","Multi-Tenant"],
     webapp: "https://tuantroli-web.vercel.app/",
-    source: "https://github.com/sekelilingmuofficial-create/sekelilingmu-docs"
+    source: "https://github.com/sekelilingmuofficial-create/sekelilingmu-docs",
+    devices: [
+      { type:"phone",  label:"Mobile App", video:"tuantroli.mp4" },
+      { type:"laptop", label:"Web Admin",  video:"tuantroli-admin.mp4" }
+    ]
   }
 };
 
 const STATUS_LABEL = { live:"Live", progress:"In Progress", soon:"Coming Soon" };
+
+const NO_VIDEO_HTML = `<div class="no-video" id="pNoVideo">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M15 10l5-3v10l-5-3M4 6h11a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2z"></path></svg>
+  Video demo segera hadir
+</div>`;
+
+/* Bentuk markup mockup berbeda-beda tergantung tipe device */
+function mockupTemplate(type){
+  if(type === "tablet"){
+    return `<div class="tablet-mock"><div class="tablet-screen"><video id="pVideo" autoplay muted loop playsinline></video>${NO_VIDEO_HTML}</div></div>`;
+  }
+  if(type === "laptop"){
+    return `<div class="laptop-mock">
+      <div class="laptop-top"><div class="laptop-screen"><video id="pVideo" autoplay muted loop playsinline></video>${NO_VIDEO_HTML}</div></div>
+      <div class="laptop-bottom"></div>
+    </div>`;
+  }
+  if(type === "desktop"){
+    return `<div class="desktop-mock">
+      <div class="desktop-screen-frame"><div class="desktop-screen"><video id="pVideo" autoplay muted loop playsinline></video>${NO_VIDEO_HTML}</div></div>
+      <div class="desktop-stand"></div>
+      <div class="desktop-base"></div>
+    </div>`;
+  }
+  /* default: phone */
+  return `<div class="phone-mock"><div class="phone-screen"><video id="pVideo" autoplay muted loop playsinline></video>${NO_VIDEO_HTML}</div></div>`;
+}
+
+function renderMockup(device){
+  const stage = document.getElementById('mockupStage');
+  stage.innerHTML = mockupTemplate(device.type);
+
+  const video = document.getElementById('pVideo');
+  const noVideo = document.getElementById('pNoVideo');
+
+  video.addEventListener('error', () => {
+    video.style.display = 'none';
+    noVideo.style.display = 'flex';
+  });
+  video.src = 'assets/videos/' + device.video;
+  video.play().catch(() => {});
+}
+
+function renderDeviceTabs(devices, activeIndex){
+  const tabsWrap = document.getElementById('deviceTabs');
+  if(!devices || devices.length <= 1){
+    tabsWrap.style.display = 'none';
+    return;
+  }
+  tabsWrap.style.display = 'flex';
+  tabsWrap.innerHTML = devices.map((d, i) =>
+    `<button type="button" class="device-tab${i === activeIndex ? ' active' : ''}" data-index="${i}">${d.label}</button>`
+  ).join('');
+
+  tabsWrap.querySelectorAll('.device-tab').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const idx = parseInt(btn.dataset.index, 10);
+      renderDeviceTabs(devices, idx);
+      renderMockup(devices[idx]);
+    });
+  });
+}
 
 document.addEventListener('DOMContentLoaded', () => {
 
@@ -411,9 +623,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const id = params.get('id');
   const project = PROJECTS[id];
 
-  const video = document.getElementById('pVideo');
-  const noVideo = document.getElementById('pNoVideo');
-
   if(!project){
     document.getElementById('pTitle').textContent = "Project tidak ditemukan";
     document.getElementById('pDesc').textContent = "Link preview ini tidak valid. Silakan kembali ke halaman utama dan pilih salah satu project.";
@@ -421,8 +630,10 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelector('.preview-label').style.display = 'none';
     document.getElementById('pWebApp').style.display = 'none';
     document.getElementById('pSource').style.display = 'none';
-    video.style.display = 'none';
-    noVideo.style.display = 'flex';
+    document.getElementById('deviceTabs').style.display = 'none';
+    document.getElementById('mockupStage').innerHTML = mockupTemplate('phone');
+    document.getElementById('pVideo').style.display = 'none';
+    document.getElementById('pNoVideo').style.display = 'flex';
     return;
   }
 
@@ -443,18 +654,13 @@ document.addEventListener('DOMContentLoaded', () => {
     tagsWrap.appendChild(span);
   });
 
-  const webBtn = document.getElementById('pWebApp');
-  webBtn.href = project.webapp;
-  const srcBtn = document.getElementById('pSource');
-  srcBtn.href = project.source;
+  document.getElementById('pWebApp').href = project.webapp;
+  document.getElementById('pSource').href = project.source;
 
-  /* ----- video: autoplay, fallback jika file belum ada ----- */
-  video.addEventListener('error', () => {
-    video.style.display = 'none';
-    noVideo.style.display = 'flex';
-  });
-  video.src = 'assets/videos/' + id + '.mp4';
-  video.play().catch(() => {});
+  /* ----- mockup + device tabs ----- */
+  const devices = (project.devices && project.devices.length) ? project.devices : [{ type:"phone", label:"Mobile App", video: id + ".mp4" }];
+  renderDeviceTabs(devices, 0);
+  renderMockup(devices[0]);
 });
 </script>
 </body>
